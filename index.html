@@ -12,14 +12,14 @@
 .status{font-weight:900;margin:13px 0 12px;font-size:1.05rem;color:var(--blanco);text-shadow:0 2px 0 rgba(0,0,0,.78),0 0 10px rgba(0,0,0,.35)}.controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}button{border:3px solid #111;border-radius:14px;padding:13px 22px;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:4px 5px 0 #111;transition:transform .08s,box-shadow .08s;background:var(--amarillo);color:#111}button:active{transform:translate(3px,4px);box-shadow:1px 1px 0 #111}.secondary{background:var(--blanco)}.hidden{display:none}.hint{font-size:.84rem;margin-top:13px;color:rgba(255,248,232,.9);text-shadow:0 1px 0 rgba(0,0,0,.85)}.finished{font-size:clamp(1.8rem,6vw,3.2rem);font-weight:1000;margin:0 0 10px}.pop{animation:pop .2s ease-out}@keyframes pop{from{transform:scale(.96);opacity:.6}to{transform:scale(1);opacity:1}}
 @media(max-height:700px){.stage{min-height:0}.card{max-height:57vh}.title{margin-bottom:6px;font-size:clamp(1.75rem,5vw,2.7rem);-webkit-text-stroke:2px var(--azul-oscuro);text-shadow:0 2px 0 var(--azul-oscuro), 2px 0 0 var(--azul-oscuro), -2px 0 0 var(--azul-oscuro), 0 -2px 0 var(--azul-oscuro), 2px 2px 0 #000}.status{margin:8px 0}}
 </style>
-</head>
+</head>	
 <body>
 <main class="app">
   <h1 class="title">Lotería Química</h1>
   <section class="stage" id="stage">
     <img id="card" class="card" src="cartas/1.png" alt="Portada de Lotería Química">
   </section>
-  <div id="status" class="status">30 cartas · Material de laboratorio</div>
+  <div id="status" class="status"></div>
   <div class="controls">
     <button id="mainBtn">BARAJAR Y COMENZAR</button>
     <button id="shuffleBtn" class="secondary hidden">↻ BARAJAR</button>
@@ -27,13 +27,19 @@
   <div id="hint" class="hint">Durante la partida también puedes usar Espacio o →</div>
 </main>
 <script>
-const TOTAL=30;
+const TOTAL=37;
 const card=document.getElementById('card'), status=document.getElementById('status');
 const mainBtn=document.getElementById('mainBtn'), shuffleBtn=document.getElementById('shuffleBtn');
 let deck=[], position=-1, playing=false, finished=false, ready=false;
 
-// Precarga las cartas reales (2.png a 31.png).
-for(let n=2;n<=31;n++){ const img=new Image(); img.src=`cartas/${n}.png`; }
+// Información inicial
+status.textContent=`${TOTAL} cartas · Material de laboratorio`;
+
+// Precarga todas las cartas reales.
+for(let n=2;n<=TOTAL+1;n++){
+  const img=new Image();
+  img.src=`cartas/${n}.png`;
+}
 
 function shuffleDeck(){
   deck=Array.from({length:TOTAL},(_,i)=>i+2);
@@ -73,7 +79,7 @@ function drawNext(){
 
 function endGame(){
   finished=true; playing=false; ready=false;
-  status.innerHTML='<span class="finished">¡LOTERÍA!</span><br>Se han echado las 30 cartas.';
+  status.innerHTML=`<span class="finished">¡LOTERÍA!</span><br>Se han echado las ${TOTAL} cartas.`;
   mainBtn.textContent='BARAJAR DE NUEVO';
   shuffleBtn.classList.add('hidden');
 }
