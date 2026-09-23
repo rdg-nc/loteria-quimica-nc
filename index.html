@@ -6,10 +6,10 @@
 <title>Lotería Química</title>
 <style>
 :root{--azul-logo:#159bd7;--amarillo:#ffd43b;--tinta:#111;--blanco:#fff8e8;--azul-oscuro:#0d2340}
-*{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:var(--azul-logo) url('fondo-laboratorio.png') center center / cover no-repeat fixed;color:var(--tinta);display:grid;place-items:center;padding:18px}
+*{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:var(--azul-logo) url('fondo-laboratorio.webp') center center / cover no-repeat fixed;color:var(--tinta);display:grid;place-items:center;padding:18px}
 .app{width:min(100%,760px);text-align:center}.title{margin:0 0 10px;font-size:clamp(2rem,5.4vw,3.4rem);font-weight:1000;text-transform:uppercase;letter-spacing:.04em;line-height:.92;color:#21D9FF;-webkit-text-stroke:3px var(--azul-oscuro);text-shadow:0 3px 0 var(--azul-oscuro), 3px 0 0 var(--azul-oscuro), -3px 0 0 var(--azul-oscuro), 0 -3px 0 var(--azul-oscuro), 3px 3px 0 #000, 0 0 14px rgba(21,155,215,.28)}.stage{display:flex;justify-content:center;align-items:center;min-height:min(70vh,690px)}
 .card{display:block;max-height:min(68vh,680px);max-width:min(92vw,390px);width:auto;height:auto;border:5px solid #111;border-radius:16px;box-shadow:10px 12px 0 rgba(0,0,0,.22);background:white;user-select:none;-webkit-user-drag:none}
-.status{font-weight:900;margin:13px 0 12px;font-size:1.05rem;color:var(--blanco);text-shadow:0 2px 0 rgba(0,0,0,.78),0 0 10px rgba(0,0,0,.35)}.controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}button{border:3px solid #111;border-radius:14px;padding:13px 22px;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:4px 5px 0 #111;transition:transform .08s,box-shadow .08s;background:var(--amarillo);color:#111}button:active{transform:translate(3px,4px);box-shadow:1px 1px 0 #111}.secondary{background:var(--blanco)}.hidden{display:none}.hint{font-size:.84rem;margin-top:13px;color:rgba(255,248,232,.9);text-shadow:0 1px 0 rgba(0,0,0,.85)}.finished{font-size:clamp(1.8rem,6vw,3.2rem);font-weight:1000;margin:0 0 10px}.pop{animation:pop .2s ease-out}@keyframes pop{from{transform:scale(.96);opacity:.6}to{transform:scale(1);opacity:1}}
+.status{font-weight:900;margin:13px 0 12px;font-size:1.05rem;color:var(--blanco);text-shadow:0 2px 0 rgba(0,0,0,.78),0 0 10px rgba(0,0,0,.35)}.controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}button{border:3px solid #111;border-radius:14px;padding:13px 22px;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:4px 5px 0 #111;transition:transform .08s,box-shadow .08s;background:var(--amarillo);color:#111}button:disabled{opacity:.65;cursor:wait;box-shadow:none}button:active{transform:translate(3px,4px);box-shadow:1px 1px 0 #111}.secondary{background:var(--blanco)}.hidden{display:none}.hint{font-size:.84rem;margin-top:13px;color:rgba(255,248,232,.9);text-shadow:0 1px 0 rgba(0,0,0,.85)}.finished{font-size:clamp(1.8rem,6vw,3.2rem);font-weight:1000;margin:0 0 10px}.pop{animation:pop .2s ease-out}@keyframes pop{from{transform:scale(.96);opacity:.6}to{transform:scale(1);opacity:1}}
 @media(max-height:700px){.stage{min-height:0}.card{max-height:57vh}.title{margin-bottom:6px;font-size:clamp(1.75rem,5vw,2.7rem);-webkit-text-stroke:2px var(--azul-oscuro);text-shadow:0 2px 0 var(--azul-oscuro), 2px 0 0 var(--azul-oscuro), -2px 0 0 var(--azul-oscuro), 0 -2px 0 var(--azul-oscuro), 2px 2px 0 #000}.status{margin:8px 0}}
 </style>
 </head>	
@@ -17,7 +17,7 @@
 <main class="app">
   <h1 class="title">Lotería Química</h1>
   <section class="stage" id="stage">
-    <img id="card" class="card" src="cartas/1.png" alt="Portada de Lotería Química">
+    <img id="card" class="card" src="cartas/1.webp" alt="Portada de Lotería Química">
   </section>
   <div id="status" class="status"></div>
   <div class="controls">
@@ -31,17 +31,44 @@ const TOTAL=37;
 const card=document.getElementById('card'), status=document.getElementById('status');
 const mainBtn=document.getElementById('mainBtn'), shuffleBtn=document.getElementById('shuffleBtn');
 let deck=[], position=-1, playing=false, finished=false, ready=false;
+let loading=true, changing=false;
+const images=new Map();
 
-// Información inicial
-status.textContent=`${TOTAL} cartas · Material de laboratorio`;
+// Carga y decodifica el mazo antes de permitir jugar.
+status.textContent=`Preparando cartas: 0 de ${TOTAL}…`;
+mainBtn.disabled=true;
+mainBtn.textContent='PREPARANDO CARTAS…';
 
-// Precarga todas las cartas reales.
-for(let n=2;n<=TOTAL+1;n++){
-  const img=new Image();
-  img.src=`cartas/${n}.png`;
+async function preloadDeck(){
+  let loaded=0;
+  try {
+    await Promise.all(Array.from({length:TOTAL},async (_,i)=>{
+      const n=i+2;
+      const img=new Image();
+      images.set(n,img); // Mantener las imágenes en memoria.
+      img.src=`cartas/${n}.webp`;
+      await new Promise((resolve,reject)=>{
+        if(img.complete) return img.naturalWidth ? resolve() : reject(new Error(`Carta ${n}`));
+        img.onload=resolve;
+        img.onerror=()=>reject(new Error(`Carta ${n}`));
+      });
+      if(img.decode) await img.decode();
+      loaded++;
+      status.textContent=`Preparando cartas: ${loaded} de ${TOTAL}…`;
+    }));
+    loading=false;
+    mainBtn.disabled=false;
+    mainBtn.textContent='BARAJAR Y COMENZAR';
+    status.textContent=`${TOTAL} cartas · Material de laboratorio`;
+  } catch(err) {
+    status.textContent=`No se pudo cargar ${err.message}. Comprueba los archivos y recarga la página.`;
+    mainBtn.textContent='ERROR DE CARGA';
+  }
 }
+preloadDeck();
 
 function shuffleDeck(){
+  if(loading || changing) return;
   deck=Array.from({length:TOTAL},(_,i)=>i+2);
   // Fisher–Yates: cada carta aparece exactamente una vez.
   for(let i=deck.length-1;i>0;i--){
@@ -49,7 +76,7 @@ function shuffleDeck(){
     [deck[i],deck[j]]=[deck[j],deck[i]];
   }
   position=-1; playing=false; finished=false; ready=true;
-  card.src='cartas/1.png';
+  card.src='cartas/1.webp';
   card.alt='Portada de Lotería Química';
   card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
   status.textContent=`Mazo barajado · ${TOTAL} cartas`;
@@ -58,6 +85,7 @@ function shuffleDeck(){
 }
 
 function startGame(){
+  if(loading || changing) return;
   if(!ready) shuffleDeck();
   playing=true; ready=false; finished=false;
   mainBtn.textContent='ECHAR CARTA';
@@ -65,16 +93,28 @@ function startGame(){
 }
 
 function drawNext(){
-  if(!playing || finished) return;
-  position++;
-  if(position>=deck.length){ endGame(); return; }
-  card.src=`cartas/${deck[position]}.png`;
-  card.alt=`Carta ${position+1} de ${TOTAL}`;
-  card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
-  status.textContent=`Carta ${position+1} de ${TOTAL}`;
-  if(position===deck.length-1){
-    mainBtn.textContent='TERMINAR';
+  if(!playing || finished || loading || changing) return;
+  if(position+1>=deck.length){ endGame(); return; }
+  const nextPosition=position+1;
+  const nextNumber=deck[nextPosition];
+  const prepared=images.get(nextNumber);
+  if(!prepared || !prepared.complete || !prepared.naturalWidth) {
+    status.textContent='La siguiente carta no está lista. Recarga la página.';
+    return;
   }
+  changing=true;
+  mainBtn.disabled=true;
+  card.src=prepared.src;
+  card.alt=`Carta ${nextPosition+1} de ${TOTAL}`;
+  card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
+  position=nextPosition;
+  status.textContent=`Carta ${position+1} de ${TOTAL}`;
+  if(position===deck.length-1) mainBtn.textContent='TERMINAR';
+  // Esperar a que el navegador tenga oportunidad de pintar la nueva carta.
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    changing=false;
+    mainBtn.disabled=false;
+  }));
 }
 
 function endGame(){
@@ -94,6 +134,7 @@ shuffleBtn.addEventListener('click',()=>{
 });
 document.addEventListener('keydown',(e)=>{
   if((e.code==='Space'||e.code==='ArrowRight') && playing && !finished){
+    if(e.repeat) { e.preventDefault(); return; }
     e.preventDefault(); drawNext();
   }
 });
