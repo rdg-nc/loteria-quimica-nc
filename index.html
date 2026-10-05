@@ -6,86 +6,135 @@
 <title>Lotería Química</title>
 <style>
 :root{--azul-logo:#159bd7;--amarillo:#ffd43b;--tinta:#111;--blanco:#fff8e8;--azul-oscuro:#0d2340}
-*{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:var(--azul-logo) url('fondo-laboratorio.webp') center center / cover no-repeat fixed;color:var(--tinta);display:grid;place-items:center;padding:18px}
-.app{width:min(100%,760px);text-align:center}.title{margin:0 0 10px;font-size:clamp(2rem,5.4vw,3.4rem);font-weight:1000;text-transform:uppercase;letter-spacing:.04em;line-height:.92;color:#21D9FF;-webkit-text-stroke:3px var(--azul-oscuro);text-shadow:0 3px 0 var(--azul-oscuro), 3px 0 0 var(--azul-oscuro), -3px 0 0 var(--azul-oscuro), 0 -3px 0 var(--azul-oscuro), 3px 3px 0 #000, 0 0 14px rgba(21,155,215,.28)}.stage{display:flex;justify-content:center;align-items:center;min-height:min(70vh,690px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:var(--azul-logo) url('fondo-laboratorio.webp') center center / cover no-repeat fixed;color:var(--tinta);display:grid;place-items:center;padding:18px}
+.app{width:min(100%,760px);text-align:center}
+.title{margin:0 0 10px;font-size:clamp(2rem,5.4vw,3.4rem);font-weight:1000;text-transform:uppercase;letter-spacing:.04em;line-height:.92;color:#21D9FF;-webkit-text-stroke:3px var(--azul-oscuro);text-shadow:0 3px 0 var(--azul-oscuro),3px 0 0 var(--azul-oscuro),-3px 0 0 var(--azul-oscuro),0 -3px 0 var(--azul-oscuro),3px 3px 0 #000,0 0 14px rgba(21,155,215,.28)}
+.stage{display:flex;justify-content:center;align-items:center;min-height:min(70vh,690px)}
 .card{display:block;max-height:min(68vh,680px);max-width:min(92vw,390px);width:auto;height:auto;border:5px solid #111;border-radius:16px;box-shadow:10px 12px 0 rgba(0,0,0,.22);background:white;user-select:none;-webkit-user-drag:none}
-.status{font-weight:900;margin:13px 0 12px;font-size:1.05rem;color:var(--blanco);text-shadow:0 2px 0 rgba(0,0,0,.78),0 0 10px rgba(0,0,0,.35)}.controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}button{border:3px solid #111;border-radius:14px;padding:13px 22px;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:4px 5px 0 #111;transition:transform .08s,box-shadow .08s;background:var(--amarillo);color:#111}button:disabled{opacity:.65;cursor:wait;box-shadow:none}button:active{transform:translate(3px,4px);box-shadow:1px 1px 0 #111}.secondary{background:var(--blanco)}.hidden{display:none}.hint{font-size:.84rem;margin-top:13px;color:rgba(255,248,232,.9);text-shadow:0 1px 0 rgba(0,0,0,.85)}.finished{font-size:clamp(1.8rem,6vw,3.2rem);font-weight:1000;margin:0 0 10px}.pop{animation:pop .2s ease-out}@keyframes pop{from{transform:scale(.96);opacity:.6}to{transform:scale(1);opacity:1}}
-@media(max-height:700px){.stage{min-height:0}.card{max-height:57vh}.title{margin-bottom:6px;font-size:clamp(1.75rem,5vw,2.7rem);-webkit-text-stroke:2px var(--azul-oscuro);text-shadow:0 2px 0 var(--azul-oscuro), 2px 0 0 var(--azul-oscuro), -2px 0 0 var(--azul-oscuro), 0 -2px 0 var(--azul-oscuro), 2px 2px 0 #000}.status{margin:8px 0}}
+.status{font-weight:900;margin:13px 0 12px;font-size:1.05rem;color:var(--blanco);text-shadow:0 2px 0 rgba(0,0,0,.78),0 0 10px rgba(0,0,0,.35)}
+.controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+button{border:3px solid #111;border-radius:14px;padding:13px 22px;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:4px 5px 0 #111;transition:transform .08s,box-shadow .08s;background:var(--amarillo);color:#111}
+button:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+button:not(:disabled):active{transform:translate(3px,4px);box-shadow:1px 1px 0 #111}
+.secondary{background:var(--blanco)}
+.description-btn{background:#21D9FF}
+.hidden{display:none!important}
+.hint{font-size:.84rem;margin-top:13px;color:rgba(255,248,232,.9);text-shadow:0 1px 0 rgba(0,0,0,.85)}
+.finished{font-size:clamp(1.8rem,6vw,3.2rem);font-weight:1000;margin:0 0 10px}
+.pop{animation:pop .2s ease-out}@keyframes pop{from{transform:scale(.96);opacity:.6}to{transform:scale(1);opacity:1}}
+.modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,18,32,.72);backdrop-filter:blur(3px)}
+.modal-box{width:min(92vw,570px);background:var(--blanco);border:4px solid #111;border-radius:22px;box-shadow:10px 12px 0 rgba(0,0,0,.32);padding:26px 26px 24px;text-align:center}
+.modal-box h2{margin:0 0 14px;font-size:clamp(1.5rem,5vw,2.25rem);color:var(--azul-oscuro)}
+.modal-box p{margin:0 0 22px;font-size:clamp(1rem,3vw,1.2rem);line-height:1.5;font-weight:600}
+.modal-box button{min-width:150px}
+@media(max-height:700px){.stage{min-height:0}.card{max-height:57vh}.title{margin-bottom:6px;font-size:clamp(1.75rem,5vw,2.7rem);-webkit-text-stroke:2px var(--azul-oscuro);text-shadow:0 2px 0 var(--azul-oscuro),2px 0 0 var(--azul-oscuro),-2px 0 0 var(--azul-oscuro),0 -2px 0 var(--azul-oscuro),2px 2px 0 #000}.status{margin:8px 0}}
 </style>
-</head>	
+</head>
 <body>
 <main class="app">
   <h1 class="title">Lotería Química</h1>
   <section class="stage" id="stage">
-    <img id="card" class="card" src="cartas/1.webp" alt="Portada de Lotería Química">
+    <img id="card" class="card" src="cartas/0.webp" alt="Portada de Lotería Química">
   </section>
   <div id="status" class="status"></div>
   <div class="controls">
     <button id="mainBtn">BARAJAR Y COMENZAR</button>
+    <button id="descriptionBtn" class="description-btn" disabled>DESCRIPCIÓN</button>
     <button id="shuffleBtn" class="secondary hidden">↻ BARAJAR</button>
   </div>
   <div id="hint" class="hint">Durante la partida también puedes usar Espacio o →</div>
 </main>
+
+<div id="descriptionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="descriptionTitle">
+  <div class="modal-box">
+    <h2 id="descriptionTitle"></h2>
+    <p id="descriptionText"></p>
+    <button id="closeDescriptionBtn">ENTENDIDO</button>
+  </div>
+</div>
+
 <script>
 const TOTAL=37;
 const card=document.getElementById('card'), status=document.getElementById('status');
 const mainBtn=document.getElementById('mainBtn'), shuffleBtn=document.getElementById('shuffleBtn');
+const descriptionBtn=document.getElementById('descriptionBtn');
+const descriptionModal=document.getElementById('descriptionModal');
+const descriptionTitle=document.getElementById('descriptionTitle');
+const descriptionText=document.getElementById('descriptionText');
+const closeDescriptionBtn=document.getElementById('closeDescriptionBtn');
+
 let deck=[], position=-1, playing=false, finished=false, ready=false;
-let loading=true, changing=false;
+let loading=true, changing=false, modalOpen=false, currentCard=0;
+let materials={};
 const images=new Map();
 
-// Carga y decodifica el mazo antes de permitir jugar.
 status.textContent=`Preparando cartas: 0 de ${TOTAL}…`;
 mainBtn.disabled=true;
 mainBtn.textContent='PREPARANDO CARTAS…';
 
-async function preloadDeck(){
-  let loaded=0;
-  try {
-    await Promise.all(Array.from({length:TOTAL},async (_,i)=>{
-      const n=i+2;
+async function preloadApp(){
+  try{
+    const response=await fetch('materiales.json',{cache:'no-cache'});
+    if(!response.ok) throw new Error('las descripciones');
+    materials=await response.json();
+
+    let loaded=0;
+    await Promise.all(Array.from({length:TOTAL+1},async (_,n)=>{
       const img=new Image();
-      images.set(n,img); // Mantener las imágenes en memoria.
+      images.set(n,img);
       img.src=`cartas/${n}.webp`;
       await new Promise((resolve,reject)=>{
-        if(img.complete) return img.naturalWidth ? resolve() : reject(new Error(`Carta ${n}`));
+        if(img.complete) return img.naturalWidth ? resolve() : reject(new Error(`la imagen ${n}`));
         img.onload=resolve;
-        img.onerror=()=>reject(new Error(`Carta ${n}`));
+        img.onerror=()=>reject(new Error(`la imagen ${n}`));
       });
       if(img.decode) await img.decode();
-      loaded++;
-      status.textContent=`Preparando cartas: ${loaded} de ${TOTAL}…`;
+      if(n!==0){
+        loaded++;
+        status.textContent=`Preparando cartas: ${loaded} de ${TOTAL}…`;
+      }
     }));
+
     loading=false;
     mainBtn.disabled=false;
     mainBtn.textContent='BARAJAR Y COMENZAR';
     status.textContent=`${TOTAL} cartas · Material de laboratorio`;
-  } catch(err) {
+  }catch(err){
     status.textContent=`No se pudo cargar ${err.message}. Comprueba los archivos y recarga la página.`;
     mainBtn.textContent='ERROR DE CARGA';
   }
 }
-preloadDeck();
+preloadApp();
+
+function updateDescriptionButton(){
+  descriptionBtn.disabled=loading || changing || modalOpen || currentCard===0 || !materials[currentCard];
+}
+
+function showCover(){
+  currentCard=0;
+  card.src=images.get(0)?.src || 'cartas/0.webp';
+  card.alt='Portada de Lotería Química';
+  card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
+  updateDescriptionButton();
+}
 
 function shuffleDeck(){
-  if(loading || changing) return;
-  deck=Array.from({length:TOTAL},(_,i)=>i+2);
-  // Fisher–Yates: cada carta aparece exactamente una vez.
+  if(loading || changing || modalOpen) return;
+  deck=Array.from({length:TOTAL},(_,i)=>i+1);
   for(let i=deck.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [deck[i],deck[j]]=[deck[j],deck[i]];
   }
   position=-1; playing=false; finished=false; ready=true;
-  card.src='cartas/1.webp';
-  card.alt='Portada de Lotería Química';
-  card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
+  showCover();
   status.textContent=`Mazo barajado · ${TOTAL} cartas`;
   mainBtn.textContent='COMENZAR';
   shuffleBtn.classList.remove('hidden');
 }
 
 function startGame(){
-  if(loading || changing) return;
+  if(loading || changing || modalOpen) return;
   if(!ready) shuffleDeck();
   playing=true; ready=false; finished=false;
   mainBtn.textContent='ECHAR CARTA';
@@ -93,27 +142,32 @@ function startGame(){
 }
 
 function drawNext(){
-  if(!playing || finished || loading || changing) return;
+  if(!playing || finished || loading || changing || modalOpen) return;
   if(position+1>=deck.length){ endGame(); return; }
+
   const nextPosition=position+1;
   const nextNumber=deck[nextPosition];
   const prepared=images.get(nextNumber);
-  if(!prepared || !prepared.complete || !prepared.naturalWidth) {
+  if(!prepared || !prepared.complete || !prepared.naturalWidth){
     status.textContent='La siguiente carta no está lista. Recarga la página.';
     return;
   }
+
   changing=true;
   mainBtn.disabled=true;
+  descriptionBtn.disabled=true;
   card.src=prepared.src;
-  card.alt=`Carta ${nextPosition+1} de ${TOTAL}`;
+  card.alt=`${materials[nextNumber]?.nombre || 'Carta'} · Carta ${nextPosition+1} de ${TOTAL}`;
   card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
   position=nextPosition;
+  currentCard=nextNumber;
   status.textContent=`Carta ${position+1} de ${TOTAL}`;
   if(position===deck.length-1) mainBtn.textContent='TERMINAR';
-  // Esperar a que el navegador tenga oportunidad de pintar la nueva carta.
+
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     changing=false;
     mainBtn.disabled=false;
+    updateDescriptionButton();
   }));
 }
 
@@ -122,6 +176,29 @@ function endGame(){
   status.innerHTML=`<span class="finished">¡LOTERÍA!</span><br>Se han echado las ${TOTAL} cartas.`;
   mainBtn.textContent='BARAJAR DE NUEVO';
   shuffleBtn.classList.add('hidden');
+  updateDescriptionButton();
+}
+
+function openDescription(){
+  if(currentCard===0 || !materials[currentCard] || loading || changing) return;
+  const material=materials[currentCard];
+  descriptionTitle.textContent=material.nombre;
+  descriptionText.textContent=material.descripcion;
+  modalOpen=true;
+  descriptionModal.classList.remove('hidden');
+  mainBtn.disabled=true;
+  shuffleBtn.disabled=true;
+  descriptionBtn.disabled=true;
+  closeDescriptionBtn.focus();
+}
+
+function closeDescription(){
+  modalOpen=false;
+  descriptionModal.classList.add('hidden');
+  mainBtn.disabled=false;
+  shuffleBtn.disabled=false;
+  updateDescriptionButton();
+  descriptionBtn.focus();
 }
 
 mainBtn.addEventListener('click',()=>{
@@ -129,12 +206,21 @@ mainBtn.addEventListener('click',()=>{
   if(!playing){ startGame(); return; }
   drawNext();
 });
+
+descriptionBtn.addEventListener('click',openDescription);
+closeDescriptionBtn.addEventListener('click',closeDescription);
+
 shuffleBtn.addEventListener('click',()=>{
+  if(modalOpen) return;
   if(!playing || confirm('¿Barajar de nuevo? Se reiniciará la partida actual.')) shuffleDeck();
 });
+
 document.addEventListener('keydown',(e)=>{
-  if((e.code==='Space'||e.code==='ArrowRight') && playing && !finished){
-    if(e.repeat) { e.preventDefault(); return; }
+  if(e.code==='Escape' && modalOpen){
+    e.preventDefault(); closeDescription(); return;
+  }
+  if((e.code==='Space'||e.code==='ArrowRight') && playing && !finished && !modalOpen){
+    if(e.repeat){e.preventDefault();return;}
     e.preventDefault(); drawNext();
   }
 });
